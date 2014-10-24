@@ -1,6 +1,6 @@
-6608af28dd53cf46303a0e205e3e085f *DESCRIPTION
-c0b0c0b662c4763880ee4ad547f36266 *NAMESPACE
-9e08d59107e9562d39267d52f10931b1 *R/replicationInterval.R
-145a3c73ded27d0d0ae6c9aba3356b4d *man/replicationInterval-package.Rd
-c051be0cd390ec1b660c0e67e23aa13b *man/ri.d.Rd
-6168d0f6f178ed5262c3c9116dcb0d73 *man/ri.r.Rd
+51780bb122a366f39135db24fe8bdc11 *DESCRIPTION
+3d22cd4b1d33bfd59364408bdcbfad6f *NAMESPACE
+ef3077b6cf0ba5a80dfe4f33f0ae9d9d *R/replicationInterval.R
+2fd6cca7624409a5e8d28c99871bba75 *man/replicationInterval-package.Rd
+a865926acda101195ddc16326ba75c2e *man/ri.d.Rd
+e4cd8f88bbbe544161ac08d91dc72e30 *man/ri.r.Rd

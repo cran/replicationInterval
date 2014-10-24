@@ -8,16 +8,16 @@
 #' due the effects of sampling error alone. Alternatively, if a replication
 #' effect size falls within the replication interval then the replication
 #' results could have reasonably occurred due to the effects of sampling error
-#' alone. This package calculates the replication interval for two different types of effect sizes (i.e., correlation, Cohen's \emph{d} ).
+#' alone. This package calculates the replication interval for two different types of effect sizes (i.e., correlation \emph{r}, standardized mean difference \emph{d} ).
 #'\tabular{ll}{
 #'Package: \tab replicationInterval\cr
 #'Type: \tab Package\cr
-#'Version: \tab 0.1\cr
-#'Date: \tab 2014-07-19\cr
+#'Version: \tab 0.2\cr
+#'Date: \tab 2014-10-24\cr
 #'License: \tab Unlimited\cr
 #'}
-#'\code{\link{ri.d}} creates a replication interval for a Cohen's \emph{d} \cr
-#'\code{\link{ri.r}} creates a replication interval for a correlation\cr
+#'\code{\link{ri.d}} creates a replication interval for a standardized mean difference (i.e., \emph{d}-value) \cr
+#'\code{\link{ri.r}} creates a replication interval for a correlation (i.e., \emph{r} )\cr
 #'
 #'@name replicationInterval-package
 #'@aliases replicationInterval
@@ -29,8 +29,9 @@
 #'Maintainer: \tab David J. Stanley \email{dstanley@@uoguelph.ca}
 #'}
 #'@references 
-#'Spence, J.R., & Stanley, D.J.(2014). Replication Interval: What to expect when you're expecting ... a replication. [manuscript in preparation] \cr\cr
-#'Stanley, D.J., & Spence, J.R.(2014). Expectations for replications: Are yours realistic? \emph{Perspectives on Psychological Science, 9}, 305-318.
+#'Stanley, D.J., & Spence, J.R.(2014). Expectations for replications: Are yours realistic? \emph{Perspectives on Psychological Science, 9}, 305-318.\cr\cr
+#'Cumming, G., & Finch, S. (2001). A primer on the understanding, use, and calculation of confidence intervals that are based on central and noncentral distributions. \emph{Educational and Psychological Measurement, 61(4)}, 532-574.
+#'
 #'@keywords package
 #'@examples
 #' ri.d(d=.65,n1=20,n2=20)
@@ -71,7 +72,9 @@ ri.d.output <- function(interval.output) {
      n1.replication <- interval.output$replication.interval.n1
      n2.replication <- interval.output$replication.interval.n2
      
-     text.ci <- sprintf("Due to sampling error, the published/sample d = %1.2f (N1 = %d and N2 = %d) could have been created by a population d-value as low as %1.2f (lower-population d-value) or as high as %1.2f (upper-population d-value).",d,n1,n2,lower.conf.limit,upper.conf.limit)
+#      text.ci <- sprintf("Due to sampling error, the published/sample d = %1.2f (N1 = %d and N2 = %d) could have been created by a population d-value as low as %1.2f (lower-population d-value) or as high as %1.2f (upper-population d-value).",d,n1,n2,lower.conf.limit,upper.conf.limit)
+     
+     text.ci <- sprintf("The %d%% confidence interval for the published sample d = %1.2f (N1 = %d and N2 = %d) is [%1.2f, %1.2f]. This confidence interval indicates a plausible range of population d-values that could have created the published sample d-value. Thus, due to the effects of random sampling error, the published sample d = %1.2f (N1 = %d and N2 = %d) could have been created by a population d-value as low as %1.2f (lower-population d-value) or as high as %1.2f (upper-population d-value).",conf.level.percent, d,n1,n2,lower.conf.limit,upper.conf.limit,d,n1,n2,lower.conf.limit,upper.conf.limit)
      
      text.lower.population <- sprintf("If the lower-population d-value of %1.2f created the published d = %1.2f (due to sampling error) then %d%% of replication d-values (using N1 = %d and N2 = % d) will fall between %1.2f and %1.2f.",lower.conf.limit,d,conf.level.percent,n1.replication,n2.replication,lower.population.lower.bound,lower.population.upper.bound)
      
@@ -81,7 +84,7 @@ ri.d.output <- function(interval.output) {
      
      text.summary <- sprintf("That is, if the study was replicated (using N1 = %d and N2 = %d) the researcher could obtain any d-value in the %1.2f to %1.2f interval due to sampling error.",n1.replication,n2.replication,lower.replication.interval,upper.replication.interval)
      
-     text.replication.interval.brief <- sprintf("Replication Interval for d = %1.2f is {%1.2f, %1.2f}.", d,lower.replication.interval,upper.replication.interval)
+     text.replication.interval.brief <- sprintf("Replication Interval for d = %1.2f is {%1.2f, %1.2f} based on the %d%% Confidence Interval [%1.2f, %1.2f].", d,lower.replication.interval,upper.replication.interval,conf.level.percent,lower.conf.limit,upper.conf.limit)
      
      text.replication.interval <- sprintf("Thus, for d = %1.2f (when replications are conducted with N1 = %d and N2 = %d) the replication interval is {%1.2f, %1.2f}.", d,n1.replication,n2.replication,lower.replication.interval,upper.replication.interval)
      
@@ -97,13 +100,16 @@ ri.d.output <- function(interval.output) {
 
 
 #' Creates a replication interval based on a published/sample Cohen's \emph{d} 
-#' @param d A sample Cohen's \emph{d}-value (standardized mean difference) created with pooled variance denominator.
+#' @param d A sample Cohen's \emph{d}-value (standardized mean difference) created with pooled variance denominator. See formulas 4.18 and 4.19 (p.26) in Borenstein, Hedges, Higgins, & Rothstein (2009).
 #' @param n1 Sample size for group 1
 #' @param n2 Sample size for group 2
 #' @param conf.level (optional 0 to 1 value) Confidence level desired (0 to 1). If not specified .95 (i.e, 95 percent) will be used.
 #' @param explain (optional boolean) Default is FALSE. If TRUE, text output explaining the interval is provided. 
 #' @param extended.output (optional boolean) Default is FALSE. If TRUE, additional details (e.g., confidence interval) provided in numeric return output.
 #' @return A list of values (\code{lower.replication.interval.d, upper.replication.interval.d}) containing the replication interval (and related statistics if requested with the \code{extended.output} argument).
+#' @references
+#' Borenstein, M., Hedges, L. V., Higgins, J. P., & Rothstein, H. R. (2009). \emph{Introduction to meta-analysis}. John Wiley & Sons.\cr\cr
+#'Cumming, G., & Finch, S. (2001). A primer on the understanding, use, and calculation of confidence intervals that are based on central and noncentral distributions. \emph{Educational and Psychological Measurement, 61(4)}, 532-574.
 #' @examples
 #' ri.d(d=.65,n1=20,n2=20)
 #' ri.d(d=.65,n1=20,n2=20,explain=TRUE)
@@ -230,7 +236,11 @@ ri.r.output <- function(interval.output) {
      
      n.replication <- interval.output$replication.interval.n
      
-     text.ci <- sprintf("Due to sampling error, the published/sample r = %1.2f (N = %d) could have been created by a population correlation as low as %1.2f (lower-population correlation) or as high as %1.2f (upper-population correlation).",r,n,lower.conf.limit,upper.conf.limit)
+#      text.ci <- sprintf("Due to sampling error, the published/sample r = %1.2f (N = %d) could have been created by a population correlation as low as %1.2f (lower-population correlation) or as high as %1.2f (upper-population correlation).",r,n,lower.conf.limit,upper.conf.limit)
+     
+     text.ci <- sprintf("The %d%% confidence interval for the published sample r = %1.2f (N = %d) is [%1.2f, %1.2f]. This confidence interval indicates a plausible range of population correlations that could have created the published sample correlation. Thus, due to the effects of random sampling error, the published sample r = %1.2f (N = %d) could have been created by a population correlation as low as %1.2f (lower-population correlation) or as high as %1.2f (upper-population correlation).",conf.level.percent,r,n,lower.conf.limit,upper.conf.limit,r,n,lower.conf.limit,upper.conf.limit)     
+     
+     
      
      text.lower.population <- sprintf("If the lower-population correlation of %1.2f created the published r = %1.2f (due to sampling error) then %d%% of replication correlations (using N = %d) will fall between %1.2f and %1.2f.",lower.conf.limit,r,conf.level.percent,n.replication,lower.population.lower.bound,lower.population.upper.bound)
      
@@ -240,7 +250,8 @@ ri.r.output <- function(interval.output) {
      
      text.summary <- sprintf("That is, if the study was replicated (using N = %d) the researcher could obtain any correlation in the %1.2f to %1.2f interval due to sampling error.",n.replication,lower.replication.interval,upper.replication.interval)
      
-     text.replication.interval.brief <- sprintf("Replication Interval for r = %1.2f is {%1.2f, %1.2f}.", r,lower.replication.interval,upper.replication.interval)
+     text.replication.interval.brief <- sprintf("Replication Interval for r = %1.2f is {%1.2f, %1.2f} based on the %d%% Confidence Interval [%1.2f, %1.2f].", r,lower.replication.interval,upper.replication.interval,conf.level.percent,lower.conf.limit,upper.conf.limit)
+     
      
      text.replication.interval <- sprintf("Thus, for r = %1.2f (when replications are conducted with N = %d) the replication interval is {%1.2f, %1.2f}.", r,n.replication,lower.replication.interval,upper.replication.interval)
      
