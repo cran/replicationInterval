@@ -12,8 +12,8 @@
 #'\tabular{ll}{
 #'Package: \tab replicationInterval\cr
 #'Type: \tab Package\cr
-#'Version: \tab 0.2\cr
-#'Date: \tab 2014-10-24\cr
+#'Version: \tab 0.3\cr
+#'Date: \tab 2015-02-04\cr
 #'License: \tab Unlimited\cr
 #'}
 #'\code{\link{ri.d}} creates a replication interval for a standardized mean difference (i.e., \emph{d}-value) \cr
@@ -22,7 +22,7 @@
 #'@name replicationInterval-package
 #'@aliases replicationInterval
 #'@docType package
-#'@title Replication Interval 
+#'@title Replication Interval Tools
 #'@author 
 #'\tabular{ll}{
 #'Author: \tab David J. Stanley \email{dstanley@@uoguelph.ca}\cr
@@ -36,8 +36,13 @@
 #'@examples
 #' ri.d(d=.65,n1=20,n2=20)
 #' ri.d(d=.65,n1=20,n2=20,explain=TRUE)
+#' ri.d(d=.65,n1=20,n2=20,rep.n1=40,rep.n2=40,explain=TRUE)
+
+
 #' ri.r(r=.35,n=40)
 #' ri.r(r=.35,n=40,explain=TRUE)
+#' ri.r(r=.35,n=40,rep.n=80,explain=TRUE)
+
 NULL
 
 
@@ -55,10 +60,10 @@ ri.d.output <- function(interval.output) {
      conf.level.percent=round(interval.output$conf.level*100,0)
      
      d <- interval.output$d
-     lower.conf.limit <- interval.output$lower.conf.limit.d 
-     upper.conf.limit <- interval.output$upper.conf.limit.d
-     n1 <- interval.output$conf.limit.n1
-     n2 <- interval.output$conf.limit.n2
+     lower.conf.limit <- interval.output$lower.confidence.interval.d 
+     upper.conf.limit <- interval.output$upper.confidence.interval.d
+     n1 <- interval.output$confidence.interval.n1
+     n2 <- interval.output$confidence.interval.n2
      
      lower.population.lower.bound <- interval.output$lower.population.lower.bound.d
      lower.population.upper.bound <- interval.output$lower.population.upper.bound.d 
@@ -103,6 +108,8 @@ ri.d.output <- function(interval.output) {
 #' @param d A sample Cohen's \emph{d}-value (standardized mean difference) created with pooled variance denominator. See formulas 4.18 and 4.19 (p.26) in Borenstein, Hedges, Higgins, & Rothstein (2009).
 #' @param n1 Sample size for group 1
 #' @param n2 Sample size for group 2
+#' @param rep.n1 Replication sample size for group 1. If not specified, n1 is used.
+#' @param rep.n2 Replication sample size for group 2. If not specified, n1 is used.
 #' @param conf.level (optional 0 to 1 value) Confidence level desired (0 to 1). If not specified .95 (i.e, 95 percent) will be used.
 #' @param explain (optional boolean) Default is FALSE. If TRUE, text output explaining the interval is provided. 
 #' @param extended.output (optional boolean) Default is FALSE. If TRUE, additional details (e.g., confidence interval) provided in numeric return output.
@@ -114,41 +121,52 @@ ri.d.output <- function(interval.output) {
 #' ri.d(d=.65,n1=20,n2=20)
 #' ri.d(d=.65,n1=20,n2=20,explain=TRUE)
 #' @export 
-ri.d <- function (d,n1,n2,conf.level=.95,explain=FALSE,extended.output=FALSE) {
+ri.d <- function (d,n1,n2,rep.n1=NA, rep.n2=NA,conf.level=.95,explain=FALSE,extended.output=FALSE) {
      
+      if (is.na(rep.n1)) {
+        rep.n1=n1
+      }
+      if (is.na(rep.n2)) {
+        rep.n2=n2
+      }
+  
      d.value.ci=MBESS::ci.smd(smd=d,n.1=n1,n.2=n2,conf.level=conf.level)
-     
      d <- d.value.ci$smd
      
      conf.lower.bound <- d.value.ci$Lower.Conf.Limit.smd
      conf.upper.bound <- d.value.ci$Upper.Conf.Limit.smd
-     
      probability.in.tail=(1 - conf.level)/2
-     
-     
-     lower.population.lower.bound <- quantile.d(probability.in.tail=probability.in.tail, ncd=conf.lower.bound,n1=n1,n2=n2,is.lower.tail=TRUE)
-     lower.population.upper.bound <- quantile.d(probability.in.tail=probability.in.tail, ncd=conf.lower.bound,n1=n1,n2=n2,is.lower.tail=FALSE)
-     
-     upper.population.lower.bound <- quantile.d(probability.in.tail=probability.in.tail, ncd=conf.upper.bound,n1=n1,n2=n2,is.lower.tail=TRUE)
-     upper.population.upper.bound <- quantile.d(probability.in.tail=probability.in.tail, ncd=conf.upper.bound,n1=n1,n2=n2,is.lower.tail=FALSE)
+          
+     lower.population.lower.bound <- quantile.d(probability.in.tail=probability.in.tail, ncd=conf.lower.bound,n1=rep.n1,n2=rep.n2,is.lower.tail=TRUE)
+     lower.population.upper.bound <- quantile.d(probability.in.tail=probability.in.tail, ncd=conf.lower.bound,n1=rep.n1,n2=rep.n2,is.lower.tail=FALSE)
+     upper.population.lower.bound <- quantile.d(probability.in.tail=probability.in.tail, ncd=conf.upper.bound,n1=rep.n1,n2=rep.n2,is.lower.tail=TRUE)
+     upper.population.upper.bound <- quantile.d(probability.in.tail=probability.in.tail, ncd=conf.upper.bound,n1=rep.n1,n2=rep.n2,is.lower.tail=FALSE)
      
      interval.output <- list()
      interval.output$conf.level <- conf.level
      interval.output$d <- d
-     interval.output$lower.conf.limit.d <- conf.lower.bound
-     interval.output$upper.conf.limit.d <- conf.upper.bound
-     interval.output$conf.limit.n1 <- n1
-     interval.output$conf.limit.n2 <- n2
+     interval.output$lower.confidence.interval.d <- conf.lower.bound
+     interval.output$upper.confidence.interval.d <- conf.upper.bound
+     interval.output$confidence.interval.n1 <- n1
+     interval.output$confidence.interval.n2 <- n2
      interval.output$lower.population.lower.bound.d <- lower.population.lower.bound
      interval.output$lower.population.upper.bound.d <- lower.population.upper.bound
      interval.output$upper.population.lower.bound.d <- upper.population.lower.bound
      interval.output$upper.population.upper.bound.d <- upper.population.upper.bound
-     interval.output$replication.interval.n1 <- n1
-     interval.output$replication.interval.n2 <- n2
+     interval.output$replication.interval.n1 <- rep.n1
+     interval.output$replication.interval.n2 <- rep.n2
      interval.output$lower.replication.interval.d <- lower.population.lower.bound
      interval.output$upper.replication.interval.d <- upper.population.upper.bound
 
+     percent.ri.due.to.ci <- ((conf.upper.bound - conf.lower.bound) /(interval.output$upper.replication.interval.d - interval.output$lower.replication.interval.d))*100
+     interval.output$percent.replication.interval.due.to.confidence.interval <- round(percent.ri.due.to.ci)
+     
+     
+     
+     
      interval.output.brief <- list()
+     interval.output.brief$lower.confidence.interval.d <- conf.lower.bound
+     interval.output.brief$upper.confidence.interval.d <- conf.upper.bound
      interval.output.brief$lower.replication.interval.d <- lower.population.lower.bound
      interval.output.brief$upper.replication.interval.d <- upper.population.upper.bound
      
@@ -221,9 +239,9 @@ ri.r.output <- function(interval.output) {
      conf.level.percent=round(interval.output$conf.level*100,0)
      
      r <- interval.output$r
-     lower.conf.limit <- interval.output$lower.conf.limit.r 
-     upper.conf.limit <- interval.output$upper.conf.limit.r
-     n <- interval.output$upper.conf.limit.n
+     lower.conf.limit <- interval.output$lower.confidence.interval.r 
+     upper.conf.limit <- interval.output$upper.confidence.interval.r
+     n <- interval.output$upper.confidence.interval.n
      
      lower.population.lower.bound <- interval.output$lower.population.lower.bound.r
      lower.population.upper.bound <- interval.output$lower.population.upper.bound.r 
@@ -268,6 +286,7 @@ ri.r.output <- function(interval.output) {
 #' Creates a replication interval based on a published/sample correlation. 
 #' @param r A sample correlation
 #' @param n Sample size 
+#' @param rep.n Replication sample size. If not specified, n is used.
 #' @param conf.level (optional 0 to 1 value) Confidence level desired (0 to 1). If not specified .95 (i.e, 95 percent) will be used.
 #' @param explain (optional boolean) Default is FALSE. If TRUE, text output explaining the interval is provided. 
 #' @param extended.output (optional boolean) Default is FALSE. If TRUE, additional details (e.g., confidence interval) provided in numeric return output.
@@ -276,8 +295,11 @@ ri.r.output <- function(interval.output) {
 #' ri.r(r=.35,n=40)
 #' ri.r(r=.35,n=40,explain=TRUE)
 #' @export
-ri.r <- function (r,n,conf.level = .95,explain=FALSE,extended.output=FALSE) {
+ri.r <- function (r,n,rep.n=NA,conf.level = .95,explain=FALSE,extended.output=FALSE) {
 
+     if (is.na(rep.n)) {
+       rep.n <- n
+     }
      
      r.value.ci=ci.r(r=r,n=n,conf.level=conf.level)
      r <- r.value.ci$r
@@ -288,20 +310,24 @@ ri.r <- function (r,n,conf.level = .95,explain=FALSE,extended.output=FALSE) {
      
      probability.in.tail=(1 - conf.level)/2
      
-     lower.population.lower.bound <- quantile.r(probability.in.tail=probability.in.tail, ncr=conf.lower.bound,n=n,is.lower.tail=TRUE)
-     lower.population.upper.bound <- quantile.r(probability.in.tail=probability.in.tail, ncr=conf.lower.bound,n=n,is.lower.tail=FALSE)
+     lower.population.lower.bound <- quantile.r(probability.in.tail=probability.in.tail, ncr=conf.lower.bound,n=rep.n,is.lower.tail=TRUE)
+     lower.population.upper.bound <- quantile.r(probability.in.tail=probability.in.tail, ncr=conf.lower.bound,n=rep.n,is.lower.tail=FALSE)
      
      
-     upper.population.lower.bound <- quantile.r(probability.in.tail=probability.in.tail, ncr=conf.upper.bound,n=n,is.lower.tail=TRUE)
-     upper.population.upper.bound <- quantile.r(probability.in.tail=probability.in.tail, ncr=conf.upper.bound,n=n,is.lower.tail=FALSE)
+     upper.population.lower.bound <- quantile.r(probability.in.tail=probability.in.tail, ncr=conf.upper.bound,n=rep.n,is.lower.tail=TRUE)
+     upper.population.upper.bound <- quantile.r(probability.in.tail=probability.in.tail, ncr=conf.upper.bound,n=rep.n,is.lower.tail=FALSE)
+     
+     
+     
+     
      
      interval.output <- list()
      interval.output$conf.level <- conf.level
      
      interval.output$r <- r
-     interval.output$lower.conf.limit.r <- conf.lower.bound
-     interval.output$upper.conf.limit.r <- conf.upper.bound
-     interval.output$upper.conf.limit.n <- n
+     interval.output$lower.confidence.interval.r <- conf.lower.bound
+     interval.output$upper.confidence.interval.r <- conf.upper.bound
+     interval.output$upper.confidence.interval.n <- n
      
      interval.output$lower.population.lower.bound.r <- lower.population.lower.bound
      interval.output$lower.population.upper.bound.r <- lower.population.upper.bound
@@ -309,13 +335,17 @@ ri.r <- function (r,n,conf.level = .95,explain=FALSE,extended.output=FALSE) {
      interval.output$upper.population.lower.bound.r <- upper.population.lower.bound
      interval.output$upper.population.upper.bound.r <- upper.population.upper.bound
      
-     interval.output$replication.interval.n <- n
+     interval.output$replication.interval.n <- rep.n
      
      interval.output$lower.replication.interval.r <- lower.population.lower.bound
      interval.output$upper.replication.interval.r <- upper.population.upper.bound
-
+         
+     percent.ri.due.to.ci <- ((conf.upper.bound - conf.lower.bound) /(interval.output$upper.replication.interval.r - interval.output$lower.replication.interval.r))*100
+     interval.output$percent.replication.interval.due.to.confidence.interval <- round(percent.ri.due.to.ci)
      
      interval.output.brief <- list()
+     interval.output.brief$lower.confidence.interval.r <- conf.lower.bound
+     interval.output.brief$upper.confidence.interval.r <- conf.upper.bound
      interval.output.brief$lower.replication.interval.r <- lower.population.lower.bound
      interval.output.brief$upper.replication.interval.r <- upper.population.upper.bound
      

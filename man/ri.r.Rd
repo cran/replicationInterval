@@ -3,12 +3,15 @@
 \alias{ri.r}
 \title{Creates a replication interval based on a published/sample correlation.}
 \usage{
-ri.r(r, n, conf.level = 0.95, explain = FALSE, extended.output = FALSE)
+ri.r(r, n, rep.n = NA, conf.level = 0.95, explain = FALSE,
+  extended.output = FALSE)
 }
 \arguments{
 \item{r}{A sample correlation}
 
 \item{n}{Sample size}
+
+\item{rep.n}{Replication sample size. If not specified, n is used.}
 
 \item{conf.level}{(optional 0 to 1 value) Confidence level desired (0 to 1). If not specified .95 (i.e, 95 percent) will be used.}
 

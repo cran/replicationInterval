@@ -3,7 +3,7 @@
 \name{replicationInterval-package}
 \alias{replicationInterval}
 \alias{replicationInterval-package}
-\title{Replication Interval}
+\title{Replication Interval Tools}
 \description{
 A common problem faced by journal reviewers and authors is the question of
 whether the results of a replication study are consistent with the original
@@ -19,8 +19,8 @@ alone. This package calculates the replication interval for two different types 
 \tabular{ll}{
 Package: \tab replicationInterval\cr
 Type: \tab Package\cr
-Version: \tab 0.2\cr
-Date: \tab 2014-10-24\cr
+Version: \tab 0.3\cr
+Date: \tab 2015-02-04\cr
 License: \tab Unlimited\cr
 }
 \code{\link{ri.d}} creates a replication interval for a standardized mean difference (i.e., \emph{d}-value) \cr
@@ -29,8 +29,10 @@ License: \tab Unlimited\cr
 \examples{
 ri.d(d=.65,n1=20,n2=20)
 ri.d(d=.65,n1=20,n2=20,explain=TRUE)
+ri.d(d=.65,n1=20,n2=20,rep.n1=40,rep.n2=40,explain=TRUE)
 ri.r(r=.35,n=40)
 ri.r(r=.35,n=40,explain=TRUE)
+ri.r(r=.35,n=40,rep.n=80,explain=TRUE)
 }
 \author{
 \tabular{ll}{

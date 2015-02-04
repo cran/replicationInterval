@@ -3,8 +3,8 @@
 \alias{ri.d}
 \title{Creates a replication interval based on a published/sample Cohen's \emph{d}}
 \usage{
-ri.d(d, n1, n2, conf.level = 0.95, explain = FALSE,
-  extended.output = FALSE)
+ri.d(d, n1, n2, rep.n1 = NA, rep.n2 = NA, conf.level = 0.95,
+  explain = FALSE, extended.output = FALSE)
 }
 \arguments{
 \item{d}{A sample Cohen's \emph{d}-value (standardized mean difference) created with pooled variance denominator. See formulas 4.18 and 4.19 (p.26) in Borenstein, Hedges, Higgins, & Rothstein (2009).}
@@ -12,6 +12,10 @@ ri.d(d, n1, n2, conf.level = 0.95, explain = FALSE,
 \item{n1}{Sample size for group 1}
 
 \item{n2}{Sample size for group 2}
+
+\item{rep.n1}{Replication sample size for group 1. If not specified, n1 is used.}
+
+\item{rep.n2}{Replication sample size for group 2. If not specified, n1 is used.}
 
 \item{conf.level}{(optional 0 to 1 value) Confidence level desired (0 to 1). If not specified .95 (i.e, 95 percent) will be used.}
 
