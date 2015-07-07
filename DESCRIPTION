@@ -1,8 +1,8 @@
 Package: replicationInterval
 Type: Package
 Title: Replication Interval Functions
-Version: 0.3
-Date: 2015-02-04
+Version: 1.0.0
+Date: 2015-07-07
 Author: David Stanley
 Maintainer: David Stanley <dstanley@uoguelph.ca>
 Description: A common problem faced by journal reviewers and authors is the
@@ -19,9 +19,9 @@ Description: A common problem faced by journal reviewers and authors is the
     calculate the replication interval for two different types of effect sizes,
     namely correlation (i.e., r) and the standardized mean difference
     (i.e., d-value).
-Imports: MBESS
+Imports: MBESS, stats
 License: Unlimited
-Packaged: 2015-02-04 22:10:06 UTC; stanley
 NeedsCompilation: no
+Packaged: 2015-07-07 14:36:01 UTC; stanley
 Repository: CRAN
-Date/Publication: 2015-02-05 00:47:35
+Date/Publication: 2015-07-07 18:11:06
